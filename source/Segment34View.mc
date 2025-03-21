@@ -688,10 +688,10 @@ class Segment34View extends WatchUi.WatchFace {
 
     hidden function alignAODRightField(offset as Number) as Void {
         var x = 0;
-        if(screenHeight == 360) { x = 345; }
-        if(screenHeight == 390) { x = 371; }
-        if(screenHeight == 416) { x = 385; }
-        if(screenHeight == 454) { x = 433; }
+        if      (screenHeight == 360) { x = 345; }
+        else if (screenHeight == 390) { x = 371; }
+        else if (screenHeight == 416) { x = 385; }
+        else if (screenHeight == 454) { x = 433; }
 
         dAodRightLabel.setLocation(x + offset, dAodRightLabel.locY);
     }
@@ -1212,12 +1212,12 @@ class Segment34View extends WatchUi.WatchFace {
                     mov = ActivityMonitor.getInfo().moveBarLevel;
                 }
             }
-            if(mov == 0) { return ""; }
-            if(mov == 1) { return "N"; }
-            if(mov == 2) { return "O"; }
-            if(mov == 3) { return "P"; }
-            if(mov == 4) { return "Q"; }
-            if(mov == 5) { return "R"; }
+            if      (mov == 0) { return "";  }
+            else if (mov == 1) { return "N"; }
+            else if (mov == 2) { return "O"; }
+            else if (mov == 3) { return "P"; }
+            else if (mov == 4) { return "Q"; }
+            else if (mov == 5) { return "R"; }
         }
         return "";
     }
