@@ -1,0 +1,83 @@
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://developer.garmin.com/downloads/connect-iq/resources.xsd">
+  <jsonData id="screen_240px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     10,           0,             10,             195,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     72,     5,        3,        80,        1,             5,
+  /* clipX, clipY, clipWidth, clipHeight */
+     205,   157,   24,        20,
+  /* maxBattery */
+     20
+  ]</jsonData>
+  <jsonData id="screen_260px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     16,           0,             16,             210,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     77,     10,       3,        80,        1,             10,
+  /* clipX, clipY, clipWidth, clipHeight */
+     220,   162,   24,        20,
+  /* maxBattery */
+     20
+  ]</jsonData>
+  <jsonData id="screen_280px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     25,           0,             25,             220,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     83,     14,       3,        80,        -1,            14,
+  /* clipX, clipY, clipWidth, clipHeight */
+     235,   170,   24,        20,
+  /* maxBattery */
+     20
+  ]</jsonData>
+  <jsonData id="screen_360px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     15,           345,           15,             297,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     103,    3,        3,        125,       -1,            0,
+  /* clipX, clipY, clipWidth, clipHeight */
+     0,     0,     0,         0,
+  /* maxBattery */
+     35
+  ]</jsonData>
+  <jsonData id="screen_390px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     17,           371,           17,             317,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     111,    8,        4,        125,       0,             4,
+  /* clipX, clipY, clipWidth, clipHeight */
+     0,     0,     0,         0,
+  /* maxBattery */
+     35
+  ]</jsonData>
+  <jsonData id="screen_416px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     31,           385,           31,             331,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     122,    15,       4,        125,       0,             10,
+  /* clipX, clipY, clipWidth, clipHeight */
+     0,     0,     0,         0,
+  /* maxBattery */
+     35
+  ]</jsonData>
+  <jsonData id="screen_454px">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     23,           433,           23,             379,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     146,    12,       4,        145,       0,             8,
+  /* clipX, clipY, clipWidth, clipHeight */
+     0,     0,     0,         0,
+  /* maxBattery */
+     35
+  ]</jsonData>
+  <jsonData id="screen_default">[
+  /* setAlignment, alignAODRight, alignNotifLeft, alignNotifAfter, */
+     0,            0,             0,              0,
+  /* barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+     110,    8,        4,        125,       0,             8,
+  /* clipX, clipY, clipWidth, clipHeight */
+     0,     0,     0,         0,
+  /* maxBattery */
+     20
+  ]</jsonData>
+</resources>

@@ -35,16 +35,30 @@ enum labelEnum {
     labelNumber
 }
 
-/* All screen heights available. */
-enum {
-    screenHeight240,    /* 240px */
-    screenHeight260,    /* 260px */
-    screenHeight280,    /* 280px */
-    screenHeight360,    /* 360px */
-    screenHeight390,    /* 390px */
-    screenHeight416,    /* 416px */
-    screenHeight454,    /* 454px */
-    screenHeightDefault
+/* Give the index of the value in the JSON array */
+enum screenConfigEnum {
+    /* Data alignment */
+    screenConfigAlignment = 0,
+    screenConfigAODRight,
+    screenConfigNotifLeft,
+    screenConfigNotifAfter,
+    /* Stress and Body Battery values */
+    screenConfigBarTop,
+    screenConfigFromEdge,
+    screenConfigBarWidth,
+    screenConfigBarHeight,
+    screenConfigBbAdujst,
+    screenConfigFromEdgeSleep,
+    /* Clipping Values */
+    screenConfigClipX,
+    screenConfigClipY,
+    screenConfigClipWidth,
+    screenConfigClipHeight,
+    /* Max Battery size */
+    screenConfigMaxBattery,
+
+    /* Must stay last to count number of properties */
+    screenConfigNumber
 }
 
 class Segment34View extends WatchUi.WatchFace {
@@ -54,13 +68,8 @@ class Segment34View extends WatchUi.WatchFace {
     private var lastUpdate as Number or Null = null;
     private var canBurnIn as Boolean = false;
 
-    private var screenWidth as Integer = 0;
-    private var screenHeight as Number = 0;
-    private var screenIndex as Integer = screenHeightDefault;
-    private var clip_x as Integer = 0;
-    private var clip_y as Integer = 0;
-    private var clip_width as Integer = 0;
-    private var clip_height as Integer = 0;
+    private var screenHeight as Integer = 0;
+    private var arrayScreenConfig as Array<Integer> = new Array<Integer>[screenConfigNumber];
 
     private var previousEssentialsVis as Boolean or Null = null;
     private var batt as Number = 0;
@@ -256,6 +265,16 @@ class Segment34View extends WatchUi.WatchFace {
 
         /* No clipping for big screens */
         if(screenHeight > 280) { return; }
+
+        /* size         clipX, clipY, clipWidth, clipHeight */
+        /* 240px      [   205,   157,        24,        20 ], */
+        /* 260px      [   220,   162,        24,        20 ], */
+        /* 280px      [   235,   170,        24,        20 ], */
+        /* Other      [     0,     0,         0,         0 ]  */
+        var clip_x      = arrayScreenConfig[screenConfigClipX];
+        var clip_y      = arrayScreenConfig[screenConfigClipY];
+        var clip_width  = arrayScreenConfig[screenConfigClipWidth];
+        var clip_height = arrayScreenConfig[screenConfigClipHeight];
 
         dc.setClip(clip_x, clip_y, clip_width, clip_height);
         dc.setColor(getColor(labelBackground), getColor(labelBackground));
@@ -542,30 +561,12 @@ class Segment34View extends WatchUi.WatchFace {
 
         /*** Bottom Complications ***/
         /* Left label */
-        leftCompWidth = 3;
-        leftCompLabelSize = 2;
-        if(screenWidth > 450) {
-            leftCompWidth = 4;
-            leftCompLabelSize = 3;
-        }
         leftCompLabel = getComplicationDesc(propLeftValueShows, leftCompLabelSize);
 
         /* Center label */
-        centerCompWidth = 3;
-        centerCompLabelSize = 2;
-        if(screenWidth > 450) {
-            centerCompWidth = 4;
-            centerCompLabelSize = 3;
-        }
         centerCompLabel = getComplicationDesc(propMiddleValueShows, centerCompLabelSize);
 
         /* Right label */
-        rightCompWidth = 4;
-        rightCompLabelSize = 3;
-        if(screenWidth == 240) {
-            rightCompWidth = 3;
-            rightCompLabelSize = 2;
-        }
         rightCompLabel = getComplicationDesc(propRightValueShows, rightCompLabelSize);
     }
 
@@ -573,34 +574,42 @@ class Segment34View extends WatchUi.WatchFace {
         /* Update all screen data */
         screenHeight = dc.getHeight();
 
-        /* Setting index */
-        if      (screenHeight == 240) { screenIndex = screenHeight240; }
-        else if (screenHeight == 260) { screenIndex = screenHeight260; }
-        else if (screenHeight == 280) { screenIndex = screenHeight280; }
-        else if (screenHeight == 360) { screenIndex = screenHeight360; }
-        else if (screenHeight == 390) { screenIndex = screenHeight390; }
-        else if (screenHeight == 416) { screenIndex = screenHeight416; }
-        else if (screenHeight == 454) { screenIndex = screenHeight454; }
-        else                          { screenIndex = screenHeightDefault; }
+        /* Loading screen configuration */
+        var idJsonScrenConfiguration = Rez.JsonData.screen_default as ResourceId;
+        switch (screenHeight) {
+            case 240: idJsonScrenConfiguration = Rez.JsonData.screen_240px;   break;
+            case 260: idJsonScrenConfiguration = Rez.JsonData.screen_260px;   break;
+            case 280: idJsonScrenConfiguration = Rez.JsonData.screen_280px;   break;
+            case 360: idJsonScrenConfiguration = Rez.JsonData.screen_360px;   break;
+            case 390: idJsonScrenConfiguration = Rez.JsonData.screen_390px;   break;
+            case 416: idJsonScrenConfiguration = Rez.JsonData.screen_416px;   break;
+            case 454: idJsonScrenConfiguration = Rez.JsonData.screen_454px;   break;
+            default:  idJsonScrenConfiguration = Rez.JsonData.screen_default; break;
+        }
+        arrayScreenConfig = Application.loadResource(idJsonScrenConfiguration);
 
-        if (screenHeight <= 280) {
-            /* No clipping above 280px so no entries in the array */
-            var screenClipValues = [
-                /* size         clipX, clipY, clipWidth, clipHeight */
-                /* 240px */   [   205,   157,        24,        20 ],
-                /* 260px */   [   220,   162,        24,        20 ],
-                /* 280px */   [   235,   170,        24,        20 ],
-            ] as Array<Array<Integer>>;
+        var screen_width = dc.getWidth();
 
-            clip_x      = screenClipValues[screenIndex][0];
-            clip_y      = screenClipValues[screenIndex][1];
-            clip_width  = screenClipValues[screenIndex][2];
-            clip_height = screenClipValues[screenIndex][3];
-        } else {
-            clip_x      = 0;
-            clip_y      = 0;
-            clip_width  = 0;
-            clip_height = 0;
+        /* Complication configuration */
+        leftCompWidth = 3;
+        leftCompLabelSize = 2;
+        if(screen_width > 450) {
+            leftCompWidth = 4;
+            leftCompLabelSize = 3;
+        }
+
+        centerCompWidth = 3;
+        centerCompLabelSize = 2;
+        if(screen_width > 450) {
+            centerCompWidth = 4;
+            centerCompLabelSize = 3;
+        }
+
+        rightCompWidth = 4;
+        rightCompLabelSize = 3;
+        if(screen_width == 240) {
+            rightCompWidth = 3;
+            rightCompLabelSize = 2;
         }
     }
 
@@ -673,9 +682,11 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function setAlignment(setting as Number, label as Text, offset as Number) as Void {
-        /* Screen alignement values :   240px, 260px 280px, 360px, 390px, 416px, 454px, Default */
-        var screenAlignValues =       [ 10,    16,   25,    15,    17,    31,    23,    0 ];
-        var x = screenAlignValues[screenIndex];
+        /* Screen alignement values :
+           240px, 260px 280px, 360px, 390px, 416px, 454px, Default
+           10,    16,   25,    15,    17,    31,    23,    0
+        */
+        var x = arrayScreenConfig[screenConfigAlignment];
 
         if(setting == 0) { // Left align
             label.setJustification(Graphics.TEXT_JUSTIFY_LEFT);
@@ -687,13 +698,11 @@ class Segment34View extends WatchUi.WatchFace {
     }
 
     hidden function alignAODRightField(offset as Number) as Void {
-        var x = 0;
-        if      (screenHeight == 360) { x = 345; }
-        else if (screenHeight == 390) { x = 371; }
-        else if (screenHeight == 416) { x = 385; }
-        else if (screenHeight == 454) { x = 433; }
-
-        dAodRightLabel.setLocation(x + offset, dAodRightLabel.locY);
+        /* Screen AOD right alignment
+           360px, 390px, 416px, 454px, Default
+           345,   416,   385,   433,   0
+        */
+        dAodRightLabel.setLocation(arrayScreenConfig[screenConfigAODRight] + offset, dAodRightLabel.locY);
     }
  
     hidden function alignNotification(setting as Number) as Void {
@@ -701,14 +710,18 @@ class Segment34View extends WatchUi.WatchFace {
         var alignment = Graphics.TEXT_JUSTIFY_RIGHT;
 
         if(setting == 1) { // Date is centered, left align notif
-            /* Screen notification alignement :    240px, 260px 280px, 360px, 390px, 416px, 454px, Default */
-            var screenNotifLeft  =     [ 10,    16,   25,    15,    17,    31,    23,    0 ];
-            x = screenNotifLeft[screenIndex];
+            /* Screen notification alignement :
+               240px, 260px 280px, 360px, 390px, 416px, 454px, Default
+               10,    16,   25,    15,    17,    31,    23,    0
+            */
+            x = arrayScreenConfig[screenConfigNotifLeft];
             alignment = Graphics.TEXT_JUSTIFY_LEFT;
         } else { // Date is left aligned, put notif after
-            /* Screen notification alignement :    240px, 260px 280px, 360px, 390px, 416px, 454px, Default */
-            var screenNotifAfter =     [ 195,   210,  220,   297,   317,   331,   379,   0 ];
-            x = screenNotifAfter[screenIndex];
+            /* Screen notification alignement :
+               240px, 260px 280px, 360px, 390px, 416px, 454px, Default
+               195,   210,  220,   297,   317,   331,   379,   0
+            */
+            x = arrayScreenConfig[screenConfigNotifAfter];
             alignment = Graphics.TEXT_JUSTIFY_RIGHT;
         }
 
@@ -839,15 +852,10 @@ class Segment34View extends WatchUi.WatchFace {
             }
         } else if(propBatteryVariant == 3) {
             var sample = 0;
-            var max = 0;
-            if(screenHeight > 280) {
-                sample = Math.round(System.getSystemStats().battery / 100.0 * 35);
-                max = 35;
-            } else {
-                sample = Math.round(System.getSystemStats().battery / 100.0 * 20);
-                max = 20;
-            }
-            
+            var max = arrayScreenConfig[screenConfigMaxBattery]; /* 35px for screen > 280px, 20px otherwise */
+
+            sample = Math.round(System.getSystemStats().battery / 100.0 * max);
+
             for(var i = 0; i < sample; i++) {
                 value += "|";
             }
@@ -1314,27 +1322,25 @@ class Segment34View extends WatchUi.WatchFace {
         if(!propShowStressAndBodyBattery) { return; }
 
         if ((Toybox has :SensorHistory) && (Toybox.SensorHistory has :getBodyBatteryHistory) && (Toybox.SensorHistory has :getStressHistory)) {
-            var stressAndBodyBatteryMeasures = [
-                /* screenHeight, barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
-                /* 240px */    [  72,     5,       3,        80,        1,             5 ],
-                /* 260px */    [  77,    10,       3,        80,        1,            10 ],
-                /* 280px */    [  83,    14,       3,        80,       -1,            14 ],
-                /* 360px */    [ 103,     3,       3,        125,      -1,             0 ],
-                /* 390px */    [ 111,     8,       4,        125,       0,             4 ],
-                /* 416px */    [ 122,    15,       4,        125,       0,            10 ],
-                /* 454px */    [ 146,    12,       4,        145,       0,             8 ],
-                /* Default */  [ 110,     8,       4,        125,       0,             8 ]
-            ] as Array<Array<Number>>;
+            /* screenHeight, barTop, fromEdge, barWidth, barHeight, bbAdjustement, fromEdgeSleeping */
+            /* 240px          72,     5,       3,        80,        1,             5  */
+            /* 260px          77,    10,       3,        80,        1,            10  */
+            /* 280px          83,    14,       3,        80,       -1,            14  */
+            /* 360px         103,     3,       3,        125,      -1,             0  */
+            /* 390px         111,     8,       4,        125,       0,             4  */
+            /* 416px         122,    15,       4,        125,       0,            10  */
+            /* 454px         146,    12,       4,        145,       0,             8  */
+            /* Default       110,     8,       4,        125,       0,             8  */
 
-            var bar_top =       stressAndBodyBatteryMeasures[screenIndex][0] as Number;
-            var from_edge =     stressAndBodyBatteryMeasures[screenIndex][1] as Number;
-            var bar_width =     stressAndBodyBatteryMeasures[screenIndex][2] as Number;
-            var bar_height =    stressAndBodyBatteryMeasures[screenIndex][3] as Number;
-            var bb_adjustment = stressAndBodyBatteryMeasures[screenIndex][4] as Number;
+            var bar_top =       arrayScreenConfig[screenConfigBarTop]    as Integer;
+            var from_edge =     arrayScreenConfig[screenConfigFromEdge]  as Integer;
+            var bar_width =     arrayScreenConfig[screenConfigBarWidth]  as Integer;
+            var bar_height =    arrayScreenConfig[screenConfigBarHeight] as Integer;
+            var bb_adjustment = arrayScreenConfig[screenConfigBbAdujst]  as Integer;
 
             /* Taking data from the last column instead */
             if (isSleeping) {
-                from_edge =     stressAndBodyBatteryMeasures[screenIndex][5];
+                from_edge =     arrayScreenConfig[screenConfigFromEdgeSleep];
             }
 
             var batt_bar = Math.round(batt * (bar_height / 100.0));
